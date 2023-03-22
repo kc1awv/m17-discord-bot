@@ -2,6 +2,7 @@ import os
 import multiprocessing
 from math import ceil
 import logging
+import logging.handlers
 
 import dotenv
 import discord
