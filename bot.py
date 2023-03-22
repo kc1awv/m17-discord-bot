@@ -164,7 +164,7 @@ def tester():
 
 try:
   # tester()
-  bot.run(token, log_handler=None)
+  bot.run(token)
 except KeyboardInterrupt as e:
   print(e)
 finally:
