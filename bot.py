@@ -1,6 +1,7 @@
 import os
-import math
 import multiprocessing
+from math import ceil
+import logging
 
 import dotenv
 import discord
@@ -11,7 +12,23 @@ from m17.blocks import *
 
 dotenv.load_dotenv()
 token = str(os.getenv('TOKEN'))
+callsign = str(os.getenv('CALLSIGN')) # for future use
+loglevel = str(os.getenv('LOGLEVEL'))
 
+logger = logging.getLogger('discord')
+logger.setLevel(loglevel)
+logging.getLogger('discord.http').setLevel(logging.INFO)
+
+handler = logging.handlers.RotatingFileHandler(
+    filename='discord.log',
+    encoding='utf-8',
+    maxBytes=32 * 1024 * 1024,  # 32 MiB
+    backupCount=5,              # Rotate through 5 files
+)
+dt_fmt = '%Y-%m-%d %H:%M:%S'
+formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 class M17Bridge(discord.AudioSource):
   #acts like both a Discord Sink, and AudioSource
@@ -73,7 +90,7 @@ class M17Bridge(discord.AudioSource):
 class M17BridgeBot(discord.Bot):
   def __init__(self, *args, **kwargs):
     super().__init__(*args,**kwargs)
-bot = M17BridgeBot(callsign="W2FBI")
+bot = M17BridgeBot(callsign=callsign)
   
 @bot.slash_command(name='refdisc', description='Disconnect a reflector bridge')
 async def refdisc(ctx):
@@ -95,16 +112,23 @@ async def refconn(ctx, reflector: str):
   if ctx.author.voice.channel.id != vc.channel.id:
     return await ctx.respond('You must be in the same channel as the bot.')
   refname, module = reflector.split(" ")
-  vc.m17 = M17Bridge("W2FBI")
+  #refname = reflector.upper # trying to do this without needing
+  #module = module.upper     # a split, to make ops easier
+  vc.m17 = M17Bridge(callsign)
   vc.m17.start(refname,module)
   
   vc.play(vc.m17)
   embed = discord.Embed(
     title='Streaming:',
-    description=f':notes: `{refname} {module}`',
+    description=f':satellite: `{refname} {module}`',
     color=discord.Colour.blurple(),
   )
   await ctx.respond(embed=embed)
+
+@bot.slash_command(name='ping', description='Send a ping to the bot')
+async def ping(ctx):
+  latency = bot.latency * 1000
+  await ctx.respond('**Pong!** Latency: ' + str(ceil(latency)) + 'ms')
 
 @bot.event
 async def on_ready():
@@ -131,7 +155,7 @@ async def on_reaction_remove(reaction, user):
   # print(f'{node.identifier} is ready.')
 
 def tester():
-  b = M17Bridge("W2FBI")
+  b = M17Bridge(callsign)
   b.start("M17-M17","Z")
   while 1:
     time.sleep(.02)
@@ -139,7 +163,7 @@ def tester():
 
 try:
   # tester()
-  bot.run(token)
+  bot.run(token, log_handler=None)
 except KeyboardInterrupt as e:
   print(e)
 finally:
