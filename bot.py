@@ -19,7 +19,6 @@ class M17Bridge(discord.AudioSource):
   def __init__(self, mycall):
     self.mycall = mycall
     self.client = m17.blocks.client_blocks("%s Z"%(mycall))
-    self.rq = multiprocessing.Queue()
 
   def start(self, refname, module):
     m17config = m17.blocks.default_config(3200)
@@ -27,6 +26,8 @@ class M17Bridge(discord.AudioSource):
     m17config.m17.src = self.mycall
     self.client.connect(refname, module)
     self.client.start()
+    self.manager = multiprocessing.Manager()
+    self.rq = self.manager.Queue()
     def copy_out(x):
       self.rq.put(x)
     self.rxchain = [self.client.receiver(), m17parse, tee("m17"), payload2codec2, codec2dec, integer_interpolate(6), to_stereo, tobytes, codeblock(copy_out), null]
@@ -38,7 +39,6 @@ class M17Bridge(discord.AudioSource):
     # self.client.stop() #not implemented
     for proc in self._modules['processes']:
       proc['process'].terminate()
-    self._wait(self._modules)
 
   def is_opus(self):
     return False
@@ -75,16 +75,20 @@ class M17BridgeBot(discord.Bot):
     super().__init__(*args,**kwargs)
 bot = M17BridgeBot(callsign="W2FBI")
   
-@bot.slash_command(name='refdisc', description='Disconnect a reflector bridge')
+@bot.slash_command(name='dev-refdisc', description='Disconnect a reflector bridge')
 async def refdisc(ctx):
+  print("refdisc recv'd")
   vc = ctx.voice_client
   if vc:
     vc.m17.stop()
-    await vc.disconnect()
-    del vc.m17
+    print("M17 stopped")
+    # del vc.m17
     await ctx.respond('DISC')
+    await vc.disconnect()
+    print("VC Disconnect")
+    print("refdisc end")
 
-@bot.slash_command(name='refconn', description='Connect to a reflector')
+@bot.slash_command(name='dev-refconn', description='Connect to a reflector')
 async def refconn(ctx, reflector: str):
   vc = ctx.voice_client
   voice = ctx.author.voice
