@@ -110,8 +110,13 @@ class M17BridgeBot(discord.Bot):
   def __init__(self, *args, **kwargs):
     super().__init__(*args,**kwargs)
 bot = M17BridgeBot(callsign=callsign)
+
+# Reflector Command Group
+# These commands control the bot's actions with an M17 Reflector
+
+ref = discord.SlashCommandGroup('ref', 'Reflector control commands')
   
-@bot.slash_command(name='refdisc', description='Disconnect a reflector bridge')
+@ref.command(name='disc', description='Disconnect a reflector bridge')
 async def refdisc(ctx):
   vc = ctx.voice_client
   if vc:
@@ -120,10 +125,13 @@ async def refdisc(ctx):
     del vc.m17
     await ctx.respond('DISC')
 
-@bot.slash_command(name='refconn', description='Connect to a reflector')
+@ref.command(name='conn', description='Connect to a reflector')
 async def refconn(ctx, reflector: str):
   vc = ctx.voice_client
   voice = ctx.author.voice
+  
+  if not voice:
+    return await ctx.respond('You are not connected to any voice channel')
   
   if not vc:
     vc = await ctx.author.voice.channel.connect()
@@ -144,14 +152,24 @@ async def refconn(ctx, reflector: str):
   )
   await ctx.respond(embed=embed)
 
-@bot.slash_command(name='ping', description='Send a ping to the bot')
+# Bot Command Group
+# These commands control or interact with the bot
+
+control = discord.SlashCommandGroup('control', 'Bot Commands and Interactions')
+
+@control.command(name='ping', description='Send a ping to the bot')
 async def ping(ctx):
   latency = bot.latency * 1000
   await ctx.respond('**Pong!** Latency: ' + str(ceil(latency)) + 'ms')
 
+# Start the bot
+
 @bot.event
 async def on_ready():
   print(f'Logged into Discord as {bot.user.name} (ID: {bot.user.id})')
+
+bot.add_application_command(ref)
+bot.add_application_command(control)
 
 #@bot.event
 #async def on_voice_state_update(member, before, after):
