@@ -126,7 +126,7 @@ async def refdisc(ctx):
     await ctx.respond('DISC')
 
 @ref.command(name='conn', description='Connect to a reflector')
-async def refconn(ctx, reflector: str):
+async def refconn(ctx, reflector: str, module: str):
   vc = ctx.voice_client
   voice = ctx.author.voice
   
@@ -138,9 +138,9 @@ async def refconn(ctx, reflector: str):
     
   if ctx.author.voice.channel.id != vc.channel.id:
     return await ctx.respond('You must be in the same channel as the bot.')
-  refname, module = reflector.split(" ")
-  #refname = reflector.upper # trying to do this without needing
-  #module = module.upper     # a split, to make ops easier
+
+  refname = reflector.upper() # trying to do this without needing
+  module = module.upper()     # a split, to make ops easier
   vc.m17 = M17Bridge(callsign)
   vc.m17.start(refname,module)
   
