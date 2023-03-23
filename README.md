@@ -39,8 +39,8 @@
 ## Key Features
 
 * `ping` - ping the bot to find latency between you and it
-* `refconn [reflector] [module]` - connect to an M17 Reflector and module to listen
-* `refdisc` - disconnect from the Reflector being listened to
+* `ref conn [reflector] [module]` - connect to an M17 Reflector and module to listen
+* `ref disc` - disconnect from the Reflector being listened to
 
 ## How To Use
 

@@ -147,7 +147,7 @@ async def refconn(ctx, reflector: str):
   vc.play(vc.m17)
   embed = discord.Embed(
     title='Streaming:',
-    description=f':satellite: Reflector: `{refname}, Module: {module}`',
+    description=f':satellite: Reflector: `{refname}`, Module: `{module}`',
     color=discord.Colour.blurple(),
   )
   await ctx.respond(embed=embed)
