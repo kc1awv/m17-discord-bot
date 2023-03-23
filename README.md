@@ -48,7 +48,9 @@
 * Python 3.9+
 * pip
 
-To clone and run this application, you'll need [Git](https://git-scm.com), [Python](https://www.python.org/), [pip](https://pypi.org/project/pip/) installed on your computer. From your command line:
+To clone and run this application, you'll need [Git](https://git-scm.com), [Python](https://www.python.org/), and [pip](https://pypi.org/project/pip/) installed on your computer. 
+
+From your command line:
 
 ```bash
 # Clone this repository
