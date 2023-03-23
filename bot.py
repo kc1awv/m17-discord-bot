@@ -121,7 +121,7 @@ async def refconn(ctx, reflector: str):
   vc.play(vc.m17)
   embed = discord.Embed(
     title='Streaming:',
-    description=f':satellite: `{refname} {module}`',
+    description=f':satellite: Reflector: `{refname}, Module: {module}`',
     color=discord.Colour.blurple(),
   )
   await ctx.respond(embed=embed)
@@ -135,21 +135,21 @@ async def ping(ctx):
 async def on_ready():
   print(f'Logged into Discord as {bot.user.name} (ID: {bot.user.id})')
 
-@bot.event
-async def on_voice_state_update(member, before, after):
-  print(f'member {member} {before} {after}')
+#@bot.event
+#async def on_voice_state_update(member, before, after):
+#  print(f'member {member} {before} {after}')
 
-@bot.event
-async def on_message(message):
-  print(f'message {message}')
+#@bot.event
+#async def on_message(message):
+#  print(f'message {message}')
 
-@bot.event
-async def on_reaction_add(reaction, user):
-  print(f'reaction {reaction}')
+#@bot.event
+#async def on_reaction_add(reaction, user):
+#  print(f'reaction {reaction}')
 
-@bot.event
-async def on_reaction_remove(reaction, user):
-  print(f'del reaction {reaction}')
+#@bot.event
+#async def on_reaction_remove(reaction, user):
+#  print(f'del reaction {reaction}')
 
 # @bot.event
 # async def on_wavelink_node_ready(node: wavelink.Node):
