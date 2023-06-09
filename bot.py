@@ -21,6 +21,8 @@ import multiprocessing
 from math import ceil
 import logging
 import logging.handlers
+import json
+import time
 
 import dotenv
 import discord
@@ -166,8 +168,26 @@ async def ping(ctx):
   latency = bot.latency * 1000
   await ctx.respond('**Pong!** Latency: ' + str(ceil(latency)) + 'ms')
 
-# Start the bot
+@control.command(name="pins")
+async def pins(ctx):
+  pins = await ctx.channel.pins()
+  dump = []
+  for p in pins:
+    po = {}
+    po["id"] = p.id
+    po["author"] = {"id":p.author.id, "name":p.author.name}
+    po["channel"] = {"id":p.channel.id, "name":p.channel.name}
+    po["__ref__"] = str(p)
+    po["content"] = p.content
+    po["url"] = p.to_reference().jump_url
+    dump.append(po)
+  fn = "pins_%s_%f.json"%(p.channel.name,time.time())
+  with open(fn,"w") as fd:
+    json.dump(dump, fd)
+  await ctx.respond("Here you go!",file=discord.File(fn))
 
+
+# Start the bot
 @bot.event
 async def on_ready():
   print(f'Logged into Discord as {bot.user.name} (ID: {bot.user.id})')
@@ -201,6 +221,8 @@ def tester():
   while 1:
     time.sleep(.02)
     f = b.read()
+
+
 
 try:
   # tester()
